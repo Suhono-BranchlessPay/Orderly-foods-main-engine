@@ -70,3 +70,10 @@ await bus.publish_event(tenant_id, "order.created.v1", {"order_id": "ORD-1001"})
 ```
 
 `subscribe_to_event` berjalan sebagai loop consumer hingga task dibatalkan. Jalankan pada worker process, bukan pada HTTP request handler.
+
+## Enterprise Knowledge Engine
+
+Aktifkan pgvector sekali pada database PostgreSQL: `CREATE EXTENSION IF NOT EXISTS vector;`.
+`KnowledgeBase` menyimpan chunk menu, jam operasional, kebijakan refund, dan SOP training dengan embedding 1536 dimensi. Pencarian melalui `search_knowledge` wajib menerima `TenantContext`; query memfilter tenant sebelum cosine-distance ordering dan memakai index `vector_cosine_ops`.
+
+`DynamicPromptBuilder` merakit prompt dari hasil retrieval, segmen pelanggan, cuaca, dan target bisnis. `generate_with_openai` memakai Responses API async dan mengubah network timeout maupun HTTP 503 menjadi `OpenAIUnavailableError` yang dapat ditangani caller dengan retry/backoff.
