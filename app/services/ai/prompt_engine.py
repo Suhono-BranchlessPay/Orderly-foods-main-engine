@@ -13,7 +13,7 @@ from app.services.ai.knowledge_engine import KnowledgeSearchHit
 
 class CustomerSegment(StrEnum):
     VIP = "VIP"
-    CHURN_RISK = "CHURN_RISK"
+    CHURN_RISK = "Chun-Risk"
 
 
 class CustomerProfile(BaseModel):

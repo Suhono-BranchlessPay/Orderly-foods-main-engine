@@ -77,3 +77,7 @@ Aktifkan pgvector sekali pada database PostgreSQL: `CREATE EXTENSION IF NOT EXIS
 `KnowledgeBase` menyimpan chunk menu, jam operasional, kebijakan refund, dan SOP training dengan embedding 1536 dimensi. Pencarian melalui `search_knowledge` wajib menerima `TenantContext`; query memfilter tenant sebelum cosine-distance ordering dan memakai index `vector_cosine_ops`.
 
 `DynamicPromptBuilder` merakit prompt dari hasil retrieval, segmen pelanggan, cuaca, dan target bisnis. `generate_with_openai` memakai Responses API async dan mengubah network timeout maupun HTTP 503 menjadi `OpenAIUnavailableError` yang dapat ditangani caller dengan retry/backoff.
+
+## Customer Intelligence dan AI Decision Engine
+
+Jalankan consumer `consume_order_completed_events` per tenant dan Celery worker dengan `celery -A app.core.celery.celery_app worker --loglevel=INFO`. Ketika event `order.completed.v1` membawa `customer_id`, task menghitung AOV/LTV dalam integer cents dan tiga menu teratas hanya dari pesanan tenant tersebut. Klasifikasi OpenAI memakai JSON Mode; timeout dan HTTP 503 akan diretry dengan exponential backoff. Segmen `Chun-Risk` mendapat satu kupon internal 15% aktif (idempotent) selama 14 hari.
